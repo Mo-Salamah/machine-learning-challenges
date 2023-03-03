@@ -483,3 +483,101 @@ def evaluate_model(X, y, model_b):
         'classification_report': classification_report(y, y_pred, output_dict=True),
         'roc_data': roc_data
     }
+
+#%%
+# Normalize confusion matrix
+
+
+def normalize_confusion_matrix(con_mat):
+    """takes an sklearn confusion matrix and returns normalized confusion matrix
+
+    Args:
+        con_mat (_type_): _description_
+    """
+
+    sums = np.sum(con_mat, axis=1)
+    
+    norm_con_mat = con_mat / sums[:, np.newaxis]
+    
+    return norm_con_mat
+
+#%%
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_confusion_matrix(cm, classes=None, zero_diagonal=False,
+                          normalize=True, title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    if zero_diagonal:
+        np.fill_diagonal(cm, 0)
+
+    if classes == None:
+        classes = np.arange(0, cm.shape[0], 1)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+
+    for i, j in np.ndindex(cm.shape):
+        color = 'white' if cm[i, j] > thresh else 'black'
+        if zero_diagonal and i == j:
+            cm[i, j] = 0
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color=color)
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+
+
+
+#%%
+def print_model_performance(models, parallel=True):
+    for model_name, model_output in models.items():
+        print(f"Model: {model_name}")
+        print(f"Accuracy: {model_output['accuracy']:.3f}")
+        print(f"Balanced Accuracy: {model_output['balanced_accuracy']:.3f}")
+        
+        if parallel:
+            print("\t", end="")
+        
+        print("Confusion Matrix:")
+        plot_confusion_matrix(model_output['confusion_matrix'], zero_diagonal=False)
+        plt.show()
+        print("Classification Report:")
+        for label, metrics in model_output['classification_report'].items():
+            if label != 'accuracy' and label != 'macro avg' and label != 'weighted avg':
+                print(f"Label: {label}")
+                print(f"\tPrecision: {metrics['precision']:.3f}")
+                print(f"\tRecall: {metrics['recall']:.3f}")
+                print(f"\tF1-Score: {metrics['f1-score']:.3f}")
+                if parallel:
+                    print("\t", end="")
+                print(f"\tSupport: {metrics['support']}")
+            
+        if model_output['roc_data']:
+            print("ROC curve:")
+            plt.plot(model_output['roc_data']['fpr'], model_output['roc_data']['tpr'], label='ROC curve (area = %0.2f)' % model_output['roc_data']['roc_auc'])
+            plt.plot([0, 1], [0, 1], 'k--')
+            plt.xlim([0.0, 1.0])
+            plt.ylim([0.0, 1.05])
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title('Receiver operating characteristic')
+            plt.legend(loc="lower right")
+            plt.show()
+        print("-"*50)

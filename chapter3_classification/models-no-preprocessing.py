@@ -13,8 +13,24 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import roc_curve
 from sklearn.metrics import confusion_matrix
 
+
+# utility
+import importlib
+# importlib.reload(performance_eval)
 # my model performance visualization file
-import performance_eval 
+import performance_eval
+importlib.reload(performance_eval)
+from performance_eval import performance_vs_thresholds
+from performance_eval import plot_digits
+from performance_eval import plot_performance_curve
+from performance_eval import refit_model_predict
+from performance_eval import evaluate_model
+from performance_eval import explore_metrics
+from performance_eval import plot_confusion_matrix
+from performance_eval import normalize_confusion_matrix
+from performance_eval import print_model_performance
+#%%
+importlib.reload(performance_eval)
 
 #%%
 # define constants
@@ -439,14 +455,33 @@ grid_search_lr_clf = joblib.load(MODELS_PATH + 'rdm_grid_search_lr_clf' + '.pkl'
 
 
 rf = evaluate_model(X_train, y_train_8, grid_search_rf_clf.best_estimator_)
-linearRegression = evaluate_model(X_train, y_train_8, grid_search_lr_clf.best_estimator_)
+log_reg = evaluate_model(X_train, y_train_8, grid_search_lr_clf.best_estimator_)
+# Keys: ['accuracy', 'balanced_accuracy', 'confusion_matrix', 'classification_report', 'roc_data']
+#%%
+# Compare Random Forests and Linear Regression
 
-%%
-# grid_search_rf_result = joblib.load(MODELS_PATH + 'grid_search_rf_result' + '.pkl')
+# Accuracy
+print('Logestic Regression', '\n')
+# print('\n')
+print('Accuracy')
+print(log_reg['accuracy'])
+
+
+print('\n', 'Random Forest', '\n')
+# print('\n')
+print('Accuracy')
+print(rf['accuracy'])
+
+
+
+
+# Weighted confusion matrix
+
+# ROC curves
 
 
 
 
 
 
-
+# %%
