@@ -1,0 +1,4 @@
+chapter3_classification/data/mnist.csv
+chapter3_classification/models/rdm_grid_search_knn_clf.pkl
+chapter3_classification/models/grid_search_knn_clf.pkl
+chapter3_classification/models/rdm_grid_serach_knn_clf.pkl 
